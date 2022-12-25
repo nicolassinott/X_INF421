@@ -32,5 +32,7 @@ int main(){
     cout << g1.itineraries_v1(2,4) << endl;
     cout << g1.itineraries_v1(1,3) << endl;
 
+    g1.makeMST();
+
     return 0;
 }

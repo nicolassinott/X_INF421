@@ -2,6 +2,9 @@
 #include <map>
 #include <set>
 #include <stack>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
 class Graph{
@@ -33,6 +36,31 @@ class Graph{
         }
 
         void makeMST(){ // make mst
+
+            // Generating priority queue of edges
+            vector<vector<int>> priorityQueue;            
+
+            for (auto const& [key1, val1] : edges){    
+                for (auto const& [key2, val2] : val1){
+                    vector<int> edge {key1, key2, val2};
+                    priorityQueue.push_back(edge);
+                }
+            }
+
+            // Sorting the priority queue
+            sort(
+                priorityQueue.begin(), 
+                priorityQueue.end(), 
+                [] (vector<int> v1, vector<int> v2) {
+                    return v1[2] < v2[2];
+                }
+            );
+
+            cout << "Checking if the vector is sorted" << endl;
+            for(vector<int> v : priorityQueue){
+                cout << v[0] << ' ' << v[1] << ' ' << v[2] << endl;
+            }
+
             return;
         }
 
