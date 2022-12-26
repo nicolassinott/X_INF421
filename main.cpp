@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "Graph.h"
+#include "UnionFind.h"
 
 
 using namespace std;
@@ -12,6 +13,23 @@ int main(){
     g1.addEdge(2,4,5);
     */
 
+    // Quickly Testing Union Find
+    UnionFind testUnionFind(10);
+
+    testUnionFind.print();
+
+    cout << "Finding parent:" << endl;
+    cout << testUnionFind.findParent(2) << endl;
+
+    testUnionFind.unionVertices(2,3);
+    testUnionFind.unionVertices(1,2);
+    testUnionFind.unionVertices(3,4);
+    testUnionFind.unionVertices(1,5);
+    testUnionFind.unionVertices(8,3);
+
+    testUnionFind.print();
+
+    // Quickly testing Graph class
     int n, m;
     cin >> n >> m;
 
