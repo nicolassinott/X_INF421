@@ -4,8 +4,14 @@
 #include <stack>
 #include <vector>
 #include <algorithm>
+#include "UnionFind.h"
 
 using namespace std;
+
+UnionFind getUnionFind(int aN){
+    UnionFind toRet(aN);  
+    return toRet;
+}
 
 class Graph{
     public:
@@ -13,16 +19,27 @@ class Graph{
         int m;
         map<int, map<int,int>> edges;
         map<int, map<int,int>> mst;
+        //UnionFind mst_UF;
 
-        Graph(int n, int m){
-            for(int i = 1; i <= n; i++){
+        //Graph();
+
+        Graph(int aN, int aM) {
+            for(int i = 1; i <= aN; i++){
                 edges[i] = {};
             }
+            n = aN;
+            m = aM;
+            //mst_UF = getUnionFind(aN);
         }
 
         void addEdge(int v1, int v2, int w){
             edges[v1].insert({v2,w});
             edges[v2].insert({v1,w});
+        }
+
+        void addEdgeMST(int v1, int v2, int w){
+            mst[v1].insert({v2,w});
+            mst[v2].insert({v1,w});
         }
 
         void print(){
@@ -35,7 +52,19 @@ class Graph{
             }
         }
 
-        void makeMST(){ // make mst
+        void printMST(){
+            for (auto const& [key1, val1] : mst){
+                cout << key1 << ':' << endl;
+                for (auto const& [key2, val2] : val1){
+                    cout << "\t" << key2 << ':' << val2 << endl;
+                }
+                cout << "\n";
+            }
+        }
+
+        void makeMST(){ 
+        
+            UnionFind mst_UF(n);
 
             // Generating priority queue of edges
             vector<vector<int>> priorityQueue;            
@@ -56,18 +85,29 @@ class Graph{
                 }
             );
 
-            cout << "Checking if the vector is sorted" << endl;
-            for(vector<int> v : priorityQueue){
-                cout << v[0] << ' ' << v[1] << ' ' << v[2] << endl;
-            }
+            vector<int> currEdge;    
+            int count = 0;
+            int idQueue = 0;
+            
+            while(count < n-1){
+                currEdge = priorityQueue[idQueue];
+                
+                if(mst_UF.findParent(currEdge[0]) != mst_UF.findParent(currEdge[1])){
+                    addEdgeMST(currEdge[0], currEdge[1], currEdge[2]);
+                    mst_UF.unionVertices(currEdge[0], currEdge[1]);
+                    count++;
+                }
 
+                idQueue++;
+            }
+            
             return;
         }
 
-        int itineraries_v1(int u, int v){ // assuming mst
-
-            // verifica se MST ja existe, senao makeMST();
-
+        int itineraries_v1(int u, int v){ 
+            if(mst.empty())
+                makeMST();
+            
             map<int, int> inversePath;
             stack<int> graphStack;
             set<int> seen = {};
@@ -83,7 +123,7 @@ class Graph{
                 if(seen.find(curr) != seen.end()){continue;} //
                 seen.insert(curr); //
 
-                for (auto const& [neighbor, weight] : edges[curr]){
+                for (auto const& [neighbor, weight] : mst[curr]){
                     graphStack.push(neighbor);
 
                     if(seen.find(neighbor) == seen.end()){
@@ -97,7 +137,7 @@ class Graph{
 
             while(currNode != u){
                 int next = inversePath[currNode];
-                maxWeight = max(maxWeight, edges[currNode][next]); //
+                maxWeight = max(maxWeight, mst[currNode][next]); //
                 currNode = next;
             }
 

@@ -9,6 +9,8 @@ class UnionFind{
         vector<int> parents, rank;
         int nElements;
 
+        UnionFind(){};
+
         UnionFind(int n){
             parents.reserve(n);
             rank.reserve(n);
