@@ -4,6 +4,8 @@
 #include <stack>
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <queue>
 #include "UnionFind.h"
 
 using namespace std;
@@ -20,6 +22,12 @@ class Graph{
         map<int, map<int,int>> edges;
         map<int, map<int,int>> mst;
         //UnionFind mst_UF;
+
+
+        // For question 3
+
+        map<int,int> depth_mp; // Takes 1 as root and maps to the depth of element with respect to 1
+        map<int, vector<pair<int,int>>> ancestors_mp; // Maps each tree element to its power of two ancestors with weight 
 
         //Graph();
 
@@ -143,5 +151,91 @@ class Graph{
 
             return maxWeight;
         }
+
+        void get_depth_map(){
+            queue<int> bfs;
+            bfs.push(1);
+
+            int curr_level = 0;
+            int next_child_counter = 0;
+            int curr_child_counter = 1;
+
+            int curr_node;
+
+            while(!bfs.empty()){
+                curr_node = bfs.front();
+                bfs.pop();
+
+                depth_mp.insert({curr_node, curr_level});
+                curr_child_counter--;
+
+                for (auto const& [child_node, weight] : mst[curr_node]){
+                    if(depth_mp.count(child_node)) continue;
+                    bfs.push(child_node);
+                    next_child_counter++;
+                }
+
+                if(!curr_child_counter){
+                    curr_child_counter = next_child_counter;
+                    next_child_counter = 0;
+                    curr_level++;
+                }
+            }
+        }
+
+        void get_ancestors(vector<int>& parents, int level, int curr_node, int max_weight){
+            vector<pair<int,int>> parent_vector;
+            for(int i = 1; i < parents.size(); i * 2){
+                parent_vector.push_back({parents[parents.size() - i],0});
+                
+            }
+            ancestors_mp.insert({curr_node, parent_vector});
+        }
+
+        // void get_depth_and_ancestors_dfs(){
+        //     stack<int> dfs;
+        //     dfs.push(1);
+
+        //     int curr_node;
+
+        //     while(!dfs.empty()){
+        //         curr_node = dfs.top();
+        //         dfs.pop();
+
+        //         for (auto const& [child_node, weight] : mst[curr_node]){
+        //             if(depth_mp.count(child_node)) continue;
+        //             dfs.push(child_node);
+        //         }
+
+
+                
+        //     }
+        // }
+
+        void print_levels(){
+            for (auto const& [key1, val1] : depth_mp){
+                cout << "Node" << key1 << " has level " << val1 << endl;
+                cout << "\n";
+            }
+        }
+
+        int max_power2_jump(int depth_1, int depth_2){
+            int power = 0;
+            int dist = max(depth_1, depth_2) - min(depth_1, depth_2);
+
+            while((1 << power) < dist){
+                power++;
+            }
+
+            return power - 1; // to check
+        }
+
+        void get_same_level(int u, int v){
+            int depth1 = depth_mp[u];
+            int depth2 = depth_mp[v];
+
+            //while(max_power2_jump...)
+        }
+
 
 };

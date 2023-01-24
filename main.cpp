@@ -42,16 +42,21 @@ int main(){
 
     g1.print();
 
-    //g1.itineraries_v1(1,4);
 
-    cout << g1.itineraries_v1(1,4) << endl;
-    cout << g1.itineraries_v1(2,4) << endl;
-    cout << g1.itineraries_v1(1,3) << endl;
+    // cout << g1.itineraries_v1(1,4) << endl;
+    // cout << g1.itineraries_v1(2,4) << endl;
+    // cout << g1.itineraries_v1(1,3) << endl;
 
-    /* testing MST
+
+    
+
+
+    // testing MST
     g1.makeMST();
     g1.printMST();
-    */
+
+    g1.get_depth_and_ancestors();
+    g1.print_levels();
 
     return 0;
 }
