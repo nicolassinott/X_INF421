@@ -55,8 +55,11 @@ int main(){
     g1.makeMST();
     g1.printMST();
 
-    g1.get_depth_and_ancestors();
-    g1.print_levels();
+    g1.get_ancestors();
+    g1.print_ancestors();
+    
+    //g1.get_depth_map();
+    //g1.print_levels();
 
     return 0;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <stack>
 #include <vector>
 #include <algorithm>
@@ -183,34 +184,60 @@ class Graph{
             }
         }
 
-        void get_ancestors(vector<int>& parents, int level, int curr_node, int max_weight){
-            vector<pair<int,int>> parent_vector;
-            for(int i = 1; i < parents.size(); i * 2){
-                parent_vector.push_back({parents[parents.size() - i],0});
-                
+        void get_ancestors(){
+            stack<int> dfs; dfs.push(1);
+            int curr_parent = 1;
+            
+            unordered_set<int> seen;
+            seen.insert(1);
+
+            vector<pair<int,int>> ancestor_vector;
+            
+            while(!dfs.empty()){
+                curr_parent = dfs.top(); dfs.pop();
+                cout << curr_parent << endl;
+
+                for (auto const& [child_node, weight] : mst[curr_parent]){
+                    if(seen.count(child_node)) continue;
+
+                    ancestor_vector.push_back({curr_parent, weight});
+                    ancestors_mp.insert({child_node, ancestor_vector});
+                    ancestor_vector.clear();
+
+                    seen.insert(child_node);
+                    dfs.push(child_node);
+                }
             }
-            ancestors_mp.insert({curr_node, parent_vector});
+
+            print_ancestors();
+
+            int log_2_n = max_power2_jump(n,0) + 1;
+            cout << log_2_n << endl;
+            pair<int,int> new_ancestor;
+
+            for(int j = 1; j < log_2_n; j++){
+                for(int v = 2; v <= n; v++){
+                    if(ancestors_mp[v].size() < j-1) continue;
+                    auto [ancestor, weight] = ancestors_mp[v][j-1];
+
+                    if(ancestor == 1 || ancestors_mp[ancestor].size() < j-1) continue;
+                    new_ancestor = {ancestors_mp[ancestor][j-1].first, max(weight, ancestors_mp[ancestor][j-1].second)};
+
+                    ancestors_mp[v].push_back(new_ancestor);
+                }
+            }
         }
 
-        // void get_depth_and_ancestors_dfs(){
-        //     stack<int> dfs;
-        //     dfs.push(1);
-
-        //     int curr_node;
-
-        //     while(!dfs.empty()){
-        //         curr_node = dfs.top();
-        //         dfs.pop();
-
-        //         for (auto const& [child_node, weight] : mst[curr_node]){
-        //             if(depth_mp.count(child_node)) continue;
-        //             dfs.push(child_node);
-        //         }
-
-
-                
-        //     }
-        // }
+        void print_ancestors(){
+            for (auto const& [node, ancestors_vector] : ancestors_mp){
+                cout << "Node " << node << ":" << endl;
+                cout << "\t"; 
+                for(auto const& [ancestor, weight] : ancestors_vector){
+                    cout << "{" << ancestor << ", " << weight << "} | "; 
+                }
+                cout << "\n";
+            }
+        }
 
         void print_levels(){
             for (auto const& [key1, val1] : depth_mp){
