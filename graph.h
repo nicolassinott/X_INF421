@@ -1,12 +1,4 @@
-#include <iostream>
-#include <map>
-#include <set>
-#include <unordered_set>
-#include <stack>
-#include <vector>
-#include <algorithm>
-#include <cmath>
-#include <queue>
+#include <bits/stdc++.h>
 #include "UnionFind.h"
 
 using namespace std;
@@ -23,7 +15,6 @@ class Graph{
         map<int, map<int,int>> edges;
         map<int, map<int,int>> mst;
         //UnionFind mst_UF;
-
 
         // For question 3
 
@@ -254,15 +245,53 @@ class Graph{
                 power++;
             }
 
-            return power - 1; // to check
+            return power - 1; 
+        }
+        
+        pair<int,int> get_same_level(int u, int v, int weight){
+            // input must be so that depth(u) > depth(v)
+            // returns the 
+
+            int depth_u = depth_mp[u];
+            int depth_v = depth_mp[v];
+
+            if(depth_u == depth_v) return {u, weight};
+
+            int jump = max_power2_jump(u,v);
+            weight = max(weight, ancestors_mp[u][jump].second); // u ou v
+
+            return get_same_level(ancestors_mp[u][jump].first, v, weight); // u ou v
         }
 
-        void get_same_level(int u, int v){
-            int depth1 = depth_mp[u];
-            int depth2 = depth_mp[v];
+        int itineraries_v2(int u, int v){
+            int depth_u = depth_mp[u];
+            int depth_v = depth_mp[v];
+            
+            if(depth_v > depth_u){
+                u = u + v; v = u - v; u = u - v;
+            }
 
-            //while(max_power2_jump...)
+            int max_weight = 0;
+            pair<int,int> same_level = get_same_level(u,v,max_weight);
+            u = same_level.first ; max_weight = same_level.second; 
+
+            if(u == v) return max_weight;
+
+            int jump = -1;
+
+            while(1){
+                jump++;
+
+                if(jump == 0 && ancestors_mp[u][jump].first == ancestors_mp[v][jump].first)
+                    return max(max_weight, max(ancestors_mp[u][jump].second, ancestors_mp[v][jump].second));
+
+                if(ancestors_mp[u][jump].first == ancestors_mp[v][jump].first){
+                    max_weight = max(max_weight, max(ancestors_mp[u][jump-1].second, ancestors_mp[v][jump-1].second));
+                    u = ancestors_mp[u][jump-1].first; v = ancestors_mp[v][jump-1].first;
+                    jump = -1;
+                }
+            }
+            return 0;
         }
-
 
 };
