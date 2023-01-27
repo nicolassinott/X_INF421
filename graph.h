@@ -144,6 +144,8 @@ class Graph{
             return maxWeight;
         }
 
+        /// Itineraries 2
+
         void get_depth_map(){
             queue<int> bfs;
             bfs.push(1);
@@ -293,6 +295,45 @@ class Graph{
                 }
             }
             return 0;
+        }
+
+        /// itineraries 3
+
+        vector<pair<int,int>> queries;
+        vector<int> output;
+
+        UnionFind color_set = getUnionFind(n);
+
+        void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
+
+            for(const auto& [child, weight] : mst[u]){
+                tarjan_LCA(child, seen, queries, output, color_set);
+                color_set.unionVertices(u,child);
+                color_set.parents[color_set.findParent(u)] = u;
+            }
+
+            seen.insert(u);
+            ///
+            for(int i = 0; i < queries.size(); i++){
+                auto [x,y] = queries[i];
+                if(u == x && seen.count(y)){
+                    output[i] = color_set.findParent(y);
+                }
+
+                if(u == y && seen.count(x)){
+                    output[i] = color_set.findParent(x);
+                }
+            }
+        }
+
+        int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
+
+            int max_weight = 0;
+
+            max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
+            max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
+
+            return max_weight;
         }
 
 };

@@ -1,5 +1,4 @@
-#include <iostream>
-#include <cmath>
+#include <bits/stdc++.h>
 #include "Graph.h"
 
 using namespace std;
@@ -30,6 +29,8 @@ int main(){
     // Quickly testing Graph class
     int n, m;
     cin >> n >> m;
+
+    vector<pair<int,int>> queries;
 
     Graph g1 = Graph(n,m);
 
@@ -73,6 +74,19 @@ int main(){
     
     //g1.get_depth_map();
     //g1.print_levels();
+
+
+    cout << "Testing the itineraries 3: " << endl;
+
+    bool test;
+    test = g1.itineraries_v1(3,2) == g1.itineraries_v2(3,2);
+    cout << test << endl;
+
+    test = g1.itineraries_v1(1,3) == g1.itineraries_v2(1,3);
+    cout << test << endl;
+
+    test = g1.itineraries_v1(2,4) == g1.itineraries_v2(2,4);
+    cout << test << endl;
 
     return 0;
 }
