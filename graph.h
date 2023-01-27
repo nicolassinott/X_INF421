@@ -202,7 +202,7 @@ class Graph{
 
             print_ancestors();
 
-            int log_2_n = max_power2_jump(n,0) + 1;
+            int log_2_n = max_power2_jump(n,0);
             cout << log_2_n << endl;
             pair<int,int> new_ancestor;
 
@@ -241,7 +241,7 @@ class Graph{
             int power = 0;
             int dist = max(depth_1, depth_2) - min(depth_1, depth_2);
 
-            while((1 << power) < dist){
+            while((1 << power) <= dist){
                 power++;
             }
 
@@ -250,14 +250,15 @@ class Graph{
         
         pair<int,int> get_same_level(int u, int v, int weight){
             // input must be so that depth(u) > depth(v)
-            // returns the 
+            // returns the
 
             int depth_u = depth_mp[u];
             int depth_v = depth_mp[v];
 
             if(depth_u == depth_v) return {u, weight};
 
-            int jump = max_power2_jump(u,v);
+            int jump = max_power2_jump(depth_u,depth_v);
+
             weight = max(weight, ancestors_mp[u][jump].second); // u ou v
 
             return get_same_level(ancestors_mp[u][jump].first, v, weight); // u ou v
@@ -282,10 +283,10 @@ class Graph{
             while(1){
                 jump++;
 
-                if(jump == 0 && ancestors_mp[u][jump].first == ancestors_mp[v][jump].first)
-                    return max(max_weight, max(ancestors_mp[u][jump].second, ancestors_mp[v][jump].second));
+                if(jump == 0 && ancestors_mp[u][0].first == ancestors_mp[v][0].first)
+                    return max(max_weight, max(ancestors_mp[u][0].second, ancestors_mp[v][0].second));
 
-                if(ancestors_mp[u][jump].first == ancestors_mp[v][jump].first){
+                if(ancestors_mp[u].size() < jump || ancestors_mp[u][jump].first == ancestors_mp[v][jump].first){
                     max_weight = max(max_weight, max(ancestors_mp[u][jump-1].second, ancestors_mp[v][jump-1].second));
                     u = ancestors_mp[u][jump-1].first; v = ancestors_mp[v][jump-1].first;
                     jump = -1;
