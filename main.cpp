@@ -28,12 +28,13 @@ int main(){
         queries.push_back({u - 1,v - 1});
     }
 
-    cout << "2" << endl;
     input_graph.makeMST();
 
-    cout << "a" << endl;
+    //necessary for itinerariesv2
     input_graph.get_depth_map();
-    cout << "aa" << endl;
+    input_graph.get_ancestors();
+    //necessary for itinerariesv2
+
     for(pair<int,int> query : queries){
         cout << input_graph.itineraries_v2(query.first, query.second) << endl;
     }

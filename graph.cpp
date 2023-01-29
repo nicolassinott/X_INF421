@@ -29,6 +29,7 @@ class Graph{
             for(int i = 0; i < n; i++){
                 depth_mp.push_back(-1);
             }
+            ancestors_mp = vector<vector<pair<int,int>>>(n);
         }
 
         void addEdge(int v1, int v2, int w){
@@ -149,11 +150,10 @@ class Graph{
             vector<int> seen(n);
             seen[0] = 1;
 
-            //vector<pair<int,int>> ancestor_vector;
-            
+            ancestors_mp[0].push_back({0, 0});
+
             while(!dfs.empty()){
                 curr_parent = dfs.top(); dfs.pop();
-                cout << curr_parent << endl;
 
                 for (auto const& [child_node, weight] : mst[curr_parent]){
                     if(seen[child_node]) continue;
@@ -163,20 +163,12 @@ class Graph{
                 }
             }
 
-            // print_ancestors();
-
-            int log_2_n = max_power2_jump(n,0);
-            cout << log_2_n << endl;
             pair<int,int> new_ancestor;
 
-            for(int j = 1; j < log_2_n; j++){
-                for(int v = 2; v <= n; v++){
-                    if(ancestors_mp[v].size() < j-1) continue;
+            for(int j = 1; j < 25; j++){
+                for(int v = 0; v < n; v++){
                     auto [ancestor, weight] = ancestors_mp[v][j-1];
-
-                    if(ancestor == 1 || ancestors_mp[ancestor].size() < j-1) continue;
                     new_ancestor = {ancestors_mp[ancestor][j-1].first, max(weight, ancestors_mp[ancestor][j-1].second)};
-
                     ancestors_mp[v].push_back(new_ancestor);
                 }
             }
@@ -224,7 +216,6 @@ class Graph{
             if(u == v) return max_weight;
 
             int jump = -1;
-
             while(1){
                 jump++;
 
@@ -242,41 +233,41 @@ class Graph{
 
         /// itineraries 3
 
-        vector<pair<int,int>> queries;
-        vector<int> output;
+        // vector<pair<int,int>> queries;
+        // vector<int> output;
 
-        UnionFind color_set = UnionFind(n);
+        // UnionFind color_set = UnionFind(n);
 
-        void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
+        // void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
 
-            for(const auto& [child, weight] : mst[u]){
-                tarjan_LCA(child, seen, queries, output, color_set);
-                color_set.unionVertices(u,child);
-                color_set.parents[color_set.findParent(u)] = u;
-            }
+        //     for(const auto& [child, weight] : mst[u]){
+        //         tarjan_LCA(child, seen, queries, output, color_set);
+        //         color_set.unionVertices(u,child);
+        //         color_set.parents[color_set.findParent(u)] = u;
+        //     }
 
-            seen.insert(u);
-            ///
-            for(int i = 0; i < queries.size(); i++){
-                auto [x,y] = queries[i];
-                if(u == x && seen.count(y)){
-                    output[i] = color_set.findParent(y);
-                }
+        //     seen.insert(u);
+        //     ///
+        //     for(int i = 0; i < queries.size(); i++){
+        //         auto [x,y] = queries[i];
+        //         if(u == x && seen.count(y)){
+        //             output[i] = color_set.findParent(y);
+        //         }
 
-                if(u == y && seen.count(x)){
-                    output[i] = color_set.findParent(x);
-                }
-            }
-        }
+        //         if(u == y && seen.count(x)){
+        //             output[i] = color_set.findParent(x);
+        //         }
+        //     }
+        // }
 
-        int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
+        // int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
 
-            int max_weight = 0;
+        //     int max_weight = 0;
 
-            max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
-            max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
+        //     max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
+        //     max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
 
-            return max_weight;
-        }
+        //     return max_weight;
+        // }
 
 };
