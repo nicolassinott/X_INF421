@@ -14,21 +14,21 @@ class Graph{
 
         // For question 3
 
-        map<int,int> depth_mp; // Takes 1 as root and maps to the depth of element with respect to 1
-        map<int, vector<pair<int,int>>> ancestors_mp; // Maps each tree element to its power of two ancestors with weight 
+        vector<int> depth_mp;// Takes 1 as root and maps to the depth of element with respect to 1
+        //map<int, vector<pair<int,int>>> ancestors_mp; // Maps each tree element to its power of two ancestors with weight 
+
+        vector<vector<pair<int,int>>> ancestors_mp;
 
         //Graph();
-
-        // UnionFind getUnionFind(int aN){
-        //     UnionFind toRet(aN);  
-        //     return toRet;
-        // }
 
         Graph(int aN, int aM) {
             n = aN;
             m = aM;
             mst_UF = UnionFind(aN); //getUnionFind(aN);
             mst = vector<vector<pair<int,int>>>(n);
+            for(int i = 0; i < n; i++){
+                depth_mp.push_back(-1);
+            }
         }
 
         void addEdge(int v1, int v2, int w){
@@ -91,8 +91,9 @@ class Graph{
                 seen[curr] = 1; //
 
                 for (auto const& [neighbor, weight] : mst[curr]){
+                    if(seen[neighbor]) continue;
                     graphStack.push(neighbor);
-                    if(seen[neighbor]) inverset_path[neighbor] = {curr, weight};
+                    inverset_path[neighbor] = {curr, weight};
                 }
             }
 
@@ -112,7 +113,7 @@ class Graph{
 
         void get_depth_map(){
             queue<int> bfs;
-            bfs.push(1);
+            bfs.push(0);
 
             int curr_level = 0;
             int next_child_counter = 0;
@@ -124,11 +125,11 @@ class Graph{
                 curr_node = bfs.front();
                 bfs.pop();
 
-                depth_mp.insert({curr_node, curr_level});
+                depth_mp[curr_node] = curr_level;
                 curr_child_counter--;
 
                 for (auto const& [child_node, weight] : mst[curr_node]){
-                    if(depth_mp.count(child_node)) continue;
+                    if(depth_mp[child_node] != -1) continue;
                     bfs.push(child_node);
                     next_child_counter++;
                 }
@@ -142,31 +143,27 @@ class Graph{
         }
 
         void get_ancestors(){
-            stack<int> dfs; dfs.push(1);
-            int curr_parent = 1;
+            stack<int> dfs; dfs.push(0);
+            int curr_parent = 0;
             
-            unordered_set<int> seen;
-            seen.insert(1);
+            vector<int> seen(n);
+            seen[0] = 1;
 
-            vector<pair<int,int>> ancestor_vector;
+            //vector<pair<int,int>> ancestor_vector;
             
             while(!dfs.empty()){
                 curr_parent = dfs.top(); dfs.pop();
                 cout << curr_parent << endl;
 
                 for (auto const& [child_node, weight] : mst[curr_parent]){
-                    if(seen.count(child_node)) continue;
-
-                    ancestor_vector.push_back({curr_parent, weight});
-                    ancestors_mp.insert({child_node, ancestor_vector});
-                    ancestor_vector.clear();
-
-                    seen.insert(child_node);
+                    if(seen[child_node]) continue;
+                    ancestors_mp[child_node].push_back({curr_parent, weight});
+                    seen[child_node] = 1;
                     dfs.push(child_node);
                 }
             }
 
-            print_ancestors();
+            // print_ancestors();
 
             int log_2_n = max_power2_jump(n,0);
             cout << log_2_n << endl;
@@ -182,24 +179,6 @@ class Graph{
 
                     ancestors_mp[v].push_back(new_ancestor);
                 }
-            }
-        }
-
-        void print_ancestors(){
-            for (auto const& [node, ancestors_vector] : ancestors_mp){
-                cout << "Node " << node << ":" << endl;
-                cout << "\t"; 
-                for(auto const& [ancestor, weight] : ancestors_vector){
-                    cout << "{" << ancestor << ", " << weight << "} | "; 
-                }
-                cout << "\n";
-            }
-        }
-
-        void print_levels(){
-            for (auto const& [key1, val1] : depth_mp){
-                cout << "Node" << key1 << " has level " << val1 << endl;
-                cout << "\n";
             }
         }
 
