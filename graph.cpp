@@ -7,9 +7,10 @@ class Graph{
     public:
         int n;
         int m;
-        map<int, map<int,int>> edges;
-        map<int, map<int,int>> mst;
-        UnionFind mst_UF = UnionFind();
+
+        vector<vector<int>> edges;
+        vector<vector<pair<int,int>>> mst;
+        UnionFind mst_UF;
 
         // For question 3
 
@@ -24,99 +25,31 @@ class Graph{
         // }
 
         Graph(int aN, int aM) {
-            for(int i = 1; i <= aN; i++){
-                edges[i] = {};
-            }
             n = aN;
             m = aM;
             mst_UF = UnionFind(aN); //getUnionFind(aN);
-        }
-
-        int countEdges(){
-            int count = 0;
-            for (auto const& [node1, val1] : edges){    
-                for (auto const& [node2, weight] : val1){
-                    count++;
-                }
-            }
-            return count;
+            mst = vector<vector<pair<int,int>>>(n);
         }
 
         void addEdge(int v1, int v2, int w){
-
-            if(edges[v1].count(v2)){
-                edges[v1][v2] = min(edges[v1][v2], w);
-                edges[v2][v1] = min(edges[v2][v1], w);
-                return;
-            }
-
-            edges[v1].insert({v2,w});
-            edges[v2].insert({v1,w});
+            vector<int> new_edge{v1,v2,w};
+            edges.push_back(new_edge);
         }
 
         void addEdgeMST(int v1, int v2, int w){
-            mst[v1].insert({v2,w});
-            mst[v2].insert({v1,w});
+            mst[v1].push_back({v2,w});
+            mst[v2].push_back({v1,w});
         }
 
-        void print(){
-            for (auto const& [key1, val1] : edges){
-                cout << key1 << ':' << endl;
-                for (auto const& [key2, val2] : val1){
-                    cout << "\t" << key2 << ':' << val2 << endl;
-                }
-                cout << "\n";
-            }
-        }
-
-        void printMST(){
-            for (auto const& [key1, val1] : mst){
-                cout << key1 << ':' << endl;
-                for (auto const& [key2, val2] : val1){
-                    cout << "\t" << key2 << ':' << val2 << endl;
-                }
-                cout << "\n";
-            }
-        }
-
-        void makeMST(){ 
-
-            if(m == n-1){
-                mst = edges;
-                return;
-            }
-
-            cout << "?" << endl;
-        
-            UnionFind mst_UF(n);
-
-            cout << "??" << endl;
-
-            // Generating priority queue of edges
-            vector<vector<int>> priorityQueue;            
-
-            for (auto const& [node1, val1] : edges){    
-                for (auto const& [node2, weight] : val1){
-                    vector<int> edge {node1, node2, weight};
-                    priorityQueue.push_back(edge);
-                }
-            }
-            cout << "???" << endl;
-
-cout << "Priority queue size" << priorityQueue.size() << endl;
-
+        void makeMST(){
             // Sorting the priority queue
             sort(
-                priorityQueue.begin(), 
-                priorityQueue.end(), 
+                edges.begin(), 
+                edges.end(), 
                 [] (vector<int> v1, vector<int> v2) {
-                    return v1[2] <= v2[2];
+                    return v1[2] < v2[2];
                 }
             );
-
-            cout << "????" << endl;
-
-            cout << "Priority queue size" << priorityQueue.size() << endl;
 
             vector<int> currEdge;    
             int count = 0;
@@ -124,9 +57,7 @@ cout << "Priority queue size" << priorityQueue.size() << endl;
             
             while(count < n-1){
 
-                if(idQueue >= priorityQueue.size()) cout << "!" << endl;
-
-                currEdge = priorityQueue[idQueue];
+                currEdge = edges[idQueue];
                 
                 if(mst_UF.findParent(currEdge[0]) != mst_UF.findParent(currEdge[1])){
                     addEdgeMST(currEdge[0], currEdge[1], currEdge[2]);
@@ -136,37 +67,32 @@ cout << "Priority queue size" << priorityQueue.size() << endl;
 
                 idQueue++;
             }
-
-            cout << "?????" << endl;
             
             return;
         }
 
         int itineraries_v1(int u, int v){ 
-            if(mst.empty())
-                makeMST();
+            if(mst.empty()) makeMST();
             
-            map<int, int> inversePath;
+            vector<pair<int,int>> inverset_path(n);
             stack<int> graphStack;
-            set<int> seen = {};
 
             graphStack.push(u);
+            int curr;
+
+            vector<bool> seen(n);
 
             while(!graphStack.empty()){
-                int curr = graphStack.top();
-                graphStack.pop();
+                curr = graphStack.top(); graphStack.pop();
 
-                if(curr == v){break;}
-
-                if(seen.find(curr) != seen.end()){continue;} //
-                seen.insert(curr); //
+                if(curr == v) break;
+                if(seen[curr]) continue; //
+                
+                seen[curr] = 1; //
 
                 for (auto const& [neighbor, weight] : mst[curr]){
                     graphStack.push(neighbor);
-
-                    if(seen.find(neighbor) == seen.end()){
-                            inversePath[neighbor] = curr;
-                    }
+                    if(seen[neighbor]) inverset_path[neighbor] = {curr, weight};
                 }
             }
 
@@ -174,8 +100,8 @@ cout << "Priority queue size" << priorityQueue.size() << endl;
             int currNode = v;
 
             while(currNode != u){
-                int next = inversePath[currNode];
-                maxWeight = max(maxWeight, mst[currNode][next]); //
+                auto [next, weight] = inverset_path[currNode];
+                maxWeight = max(maxWeight, weight); //
                 currNode = next;
             }
 

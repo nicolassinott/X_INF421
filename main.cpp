@@ -45,8 +45,6 @@ void get_output(Graph& g, vector<pair<int,int>>& queries){
 }
 
 int main(){
-    //cout << "1?" << endl;
-
     int n, m;
     int u, v, w;
     int l;
@@ -57,13 +55,9 @@ int main(){
 
     Graph input_graph = Graph(n,m);
 
-    for(int i = 0; i < m; i++){
-
-        
+    for(int i = 0; i < m; i++){       
         cin >> u >> v >> w;
-        input_graph.addEdge(u, v, w);
-        cout << i << endl;
-        cout << "Edges: " << input_graph.countEdges() << endl;
+        input_graph.addEdge(u - 1, v - 1, w);
     }
 
     // Saving the queries
@@ -71,26 +65,16 @@ int main(){
 
     for(int i = 0; i < l; i++){
         cin >> u >> v;
-        queries.push_back({u,v});
+        queries.push_back({u - 1,v - 1});
     }
 
-    
-
-    input_graph.print();
     input_graph.makeMST();
-
-    cout << "Making MST" << endl;
-
-    input_graph.printMST();
 
     for(pair<int,int> query : queries){
         cout << input_graph.itineraries_v1(query.first, query.second) << endl;
     }
 
-    cout << "nice" << endl;
-
-    cout << input_graph.edges[17][11] << endl;
-    cout << input_graph.edges[11][17] << endl;
+    // cout << "nice" << endl;
 
 
     //get_input();
