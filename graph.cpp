@@ -15,11 +15,7 @@ class Graph{
         // For question 3
 
         vector<int> depth_mp;// Takes 1 as root and maps to the depth of element with respect to 1
-        //map<int, vector<pair<int,int>>> ancestors_mp; // Maps each tree element to its power of two ancestors with weight 
-
         vector<vector<pair<int,int>>> ancestors_mp;
-
-        //Graph();
 
         Graph(int aN, int aM) {
             n = aN;
@@ -233,41 +229,41 @@ class Graph{
 
         /// itineraries 3
 
-        // vector<pair<int,int>> queries;
-        // vector<int> output;
+        vector<pair<int,int>> queries;
+        vector<int> output;
 
-        // UnionFind color_set = UnionFind(n);
+        UnionFind color_set = UnionFind(n);
 
-        // void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
+        void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
 
-        //     for(const auto& [child, weight] : mst[u]){
-        //         tarjan_LCA(child, seen, queries, output, color_set);
-        //         color_set.unionVertices(u,child);
-        //         color_set.parents[color_set.findParent(u)] = u;
-        //     }
+            for(const auto& [child, weight] : mst[u]){
+                tarjan_LCA(child, seen, queries, output, color_set);
+                color_set.unionVertices(u,child);
+                color_set.parents[color_set.findParent(u)] = u;
+            }
 
-        //     seen.insert(u);
-        //     ///
-        //     for(int i = 0; i < queries.size(); i++){
-        //         auto [x,y] = queries[i];
-        //         if(u == x && seen.count(y)){
-        //             output[i] = color_set.findParent(y);
-        //         }
+            seen.insert(u);
+            ///
+            for(int i = 0; i < queries.size(); i++){
+                auto [x,y] = queries[i];
+                if(u == x && seen.count(y)){
+                    output[i] = color_set.findParent(y);
+                }
 
-        //         if(u == y && seen.count(x)){
-        //             output[i] = color_set.findParent(x);
-        //         }
-        //     }
-        // }
+                if(u == y && seen.count(x)){
+                    output[i] = color_set.findParent(x);
+                }
+            }
+        }
 
-        // int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
+        int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
 
-        //     int max_weight = 0;
+            int max_weight = 0;
 
-        //     max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
-        //     max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
+            max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
+            max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
 
-        //     return max_weight;
-        // }
+            return max_weight;
+        }
 
 };
