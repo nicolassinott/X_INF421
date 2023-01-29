@@ -1,12 +1,7 @@
 #include <bits/stdc++.h>
-#include "UnionFind.h"
+#include "UnionFind.cpp"
 
 using namespace std;
-
-UnionFind getUnionFind(int aN){
-    UnionFind toRet(aN);  
-    return toRet;
-}
 
 class Graph{
     public:
@@ -14,7 +9,7 @@ class Graph{
         int m;
         map<int, map<int,int>> edges;
         map<int, map<int,int>> mst;
-        //UnionFind mst_UF;
+        UnionFind mst_UF = UnionFind();
 
         // For question 3
 
@@ -23,16 +18,38 @@ class Graph{
 
         //Graph();
 
+        // UnionFind getUnionFind(int aN){
+        //     UnionFind toRet(aN);  
+        //     return toRet;
+        // }
+
         Graph(int aN, int aM) {
             for(int i = 1; i <= aN; i++){
                 edges[i] = {};
             }
             n = aN;
             m = aM;
-            //mst_UF = getUnionFind(aN);
+            mst_UF = UnionFind(aN); //getUnionFind(aN);
+        }
+
+        int countEdges(){
+            int count = 0;
+            for (auto const& [node1, val1] : edges){    
+                for (auto const& [node2, weight] : val1){
+                    count++;
+                }
+            }
+            return count;
         }
 
         void addEdge(int v1, int v2, int w){
+
+            if(edges[v1].count(v2)){
+                edges[v1][v2] = min(edges[v1][v2], w);
+                edges[v2][v1] = min(edges[v2][v1], w);
+                return;
+            }
+
             edges[v1].insert({v2,w});
             edges[v2].insert({v1,w});
         }
@@ -63,33 +80,52 @@ class Graph{
         }
 
         void makeMST(){ 
+
+            if(m == n-1){
+                mst = edges;
+                return;
+            }
+
+            cout << "?" << endl;
         
             UnionFind mst_UF(n);
+
+            cout << "??" << endl;
 
             // Generating priority queue of edges
             vector<vector<int>> priorityQueue;            
 
-            for (auto const& [key1, val1] : edges){    
-                for (auto const& [key2, val2] : val1){
-                    vector<int> edge {key1, key2, val2};
+            for (auto const& [node1, val1] : edges){    
+                for (auto const& [node2, weight] : val1){
+                    vector<int> edge {node1, node2, weight};
                     priorityQueue.push_back(edge);
                 }
             }
+            cout << "???" << endl;
+
+cout << "Priority queue size" << priorityQueue.size() << endl;
 
             // Sorting the priority queue
             sort(
                 priorityQueue.begin(), 
                 priorityQueue.end(), 
                 [] (vector<int> v1, vector<int> v2) {
-                    return v1[2] < v2[2];
+                    return v1[2] <= v2[2];
                 }
             );
+
+            cout << "????" << endl;
+
+            cout << "Priority queue size" << priorityQueue.size() << endl;
 
             vector<int> currEdge;    
             int count = 0;
             int idQueue = 0;
             
             while(count < n-1){
+
+                if(idQueue >= priorityQueue.size()) cout << "!" << endl;
+
                 currEdge = priorityQueue[idQueue];
                 
                 if(mst_UF.findParent(currEdge[0]) != mst_UF.findParent(currEdge[1])){
@@ -100,6 +136,8 @@ class Graph{
 
                 idQueue++;
             }
+
+            cout << "?????" << endl;
             
             return;
         }
@@ -302,7 +340,7 @@ class Graph{
         vector<pair<int,int>> queries;
         vector<int> output;
 
-        UnionFind color_set = getUnionFind(n);
+        UnionFind color_set = UnionFind(n);
 
         void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
 

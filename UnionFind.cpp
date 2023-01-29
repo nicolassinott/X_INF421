@@ -20,6 +20,18 @@ class UnionFind{
             }
         }
 
+        UnionFind(const UnionFind& UF){
+            cerr << "i am dumb" << endl;
+            nElements = UF.nElements;
+            for(auto n : UF.parents){
+                parents.push_back(n);
+            }
+            for(auto n : UF.rank){
+                rank.push_back(n);
+            }
+        }
+
+
         void print(){
             cout << "This is the parent array:" << "\n";
             for(int i = 0; i < nElements; i++){
