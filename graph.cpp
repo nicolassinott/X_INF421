@@ -249,12 +249,11 @@ class Graph{
 
         /// itineraries 3
 
-        void tarjan_lca(int u, int previous_parent, vector<pair<int,int>>& queries, vector<int>& output){
-
+        void tarjan_lca(int u, int previous_parent, vector<vector<pair<int,int>>>& queries_map, vector<int>& output){
             for(const auto& [child, weight] : mst[u]){
                 if(child == previous_parent) continue;
 
-                tarjan_lca(child, u, queries, output);
+                tarjan_lca(child, u, queries_map, output);
 
                 color_set.set_parent(child, u);
                 curr_noise[child] = weight;
@@ -262,16 +261,11 @@ class Graph{
 
             color_seen[u] = 1;
 
-            for(int i = 0; i < queries.size(); i++){
-                auto [x,y] = queries[i];
-                if(u == x && color_seen[y]){
-                    update_weight_to_root(y);
-                    queries_LCA[color_set.find_root(y)].push_back({i,y,u});
-                }
-
-                if(u == y && color_seen[x]){
-                    update_weight_to_root(x);
-                    queries_LCA[color_set.find_root(x)].push_back({i,x,u});
+            for(pair<int,int> query : queries_map[u]){
+                auto[index, other_node] = query;
+                if(color_seen[other_node]){
+                    update_weight_to_root(other_node);
+                    queries_LCA[color_set.find_root(other_node)].push_back({index,other_node,u});
                 }
             }
 
@@ -280,8 +274,8 @@ class Graph{
                 int computed_node = query[1];
                 int to_compute_node = query[2];
                 
-                update_weight_to_root(to_compute_node);
                 update_weight_to_root(computed_node);
+                update_weight_to_root(to_compute_node);
 
                 if(computed_node == to_compute_node) output[output_integer] = 0;
                 else if(computed_node == u) output[output_integer] = curr_noise[to_compute_node];
@@ -292,18 +286,18 @@ class Graph{
             return;
         }
 
-        // functions to allow the mapping {ancestor, node} -> weight
-        int hash_function(int ancestor, int node){
-            return ancestor * n + node;
-        }
+        vector<vector<pair<int,int>>> get_queries_map(vector<pair<int,int>>& queries){
+            vector<vector<pair<int,int>>> queries_map(n);
+            pair<int,int> query;
 
-        pair<int,int> de_hash_function(int hash){
-            int ancestor = hash % n; 
-            int node = hash - ancestor * n;
-            return {ancestor, node};
-        }
+            for (int i = 0; i < queries.size(); i++){
+                query = queries[i];
+                queries_map[query.first].push_back({i, query.second});
+                queries_map[query.second].push_back({i, query.first});
+            }
 
-        // updating ancestor weight mapping
+            return queries_map;
+        }
 
         void update_weight_to_root(int node){
             int ancestor = color_set.find_root(node);
@@ -328,31 +322,14 @@ class Graph{
             }
         }
 
-        // void upward_update(int node){
-        //     int curr_ancestor = color_set.find_root(node);
-        //     int next = node;
-        //     while(next != curr_ancestor){
-        //         curr_noise[node] = max(curr_noise[node], curr_noise[next]);
-        //         next = color_set.get_parent(next);
-        //     }
-        // }
-
-        // while the current LCA is not reach, move up and update the table
-
-        void itineraries_v3(vector<pair<int,int>>& queries, vector<int>& output){
-            tarjan_lca(0, 0, queries, output);
+        void itineraries_v3(vector<vector<pair<int,int>>>& queries_map, vector<int>& output){
+            tarjan_lca(0, 0, queries_map, output);
+            
             for(int answer : output){
                 cout << answer << endl;
             }
 
             return;
-
-            // int max_weight = 0;
-
-            // max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
-            // max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
-
-            // return max_weight;
         }
 
 };

@@ -42,6 +42,7 @@ int main(){
     //necessary for itinerariesv3
 
     vector<int> output(l);
+    vector<vector<pair<int,int>>> queries_map = input_graph.get_queries_map(queries);
 
-    input_graph.itineraries_v3(queries, output);
+    input_graph.itineraries_v3(queries_map, output);
 }
