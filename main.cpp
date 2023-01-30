@@ -32,10 +32,16 @@ int main(){
 
     //necessary for itinerariesv2
     input_graph.get_depth_map();
-    input_graph.get_ancestors();
-    //necessary for itinerariesv2
+    // input_graph.get_ancestors();
+    // //necessary for itinerariesv2
 
-    for(pair<int,int> query : queries){
-        cout << input_graph.itineraries_v2(query.first, query.second) << endl;
-    }
+    // for(pair<int,int> query : queries){
+    //     cout << input_graph.itineraries_v2(query.first, query.second) << endl;
+    // }
+
+    //necessary for itinerariesv3
+
+    vector<int> output(l);
+
+    input_graph.itineraries_v3(queries, output);
 }

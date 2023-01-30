@@ -21,6 +21,9 @@ class Graph{
 
         UnionFind color_set;
         vector<int> color_seen;
+        vector<int> curr_noise;
+        vector<vector<vector<int>>> queries_LCA;
+
         unordered_map<int, int> hash_weight_mp;
 
         Graph(int aN, int aM) {
@@ -40,7 +43,9 @@ class Graph{
             // Only ncessary from Task 4
 
             color_set = UnionFind(aN);
-            color_seen = vector<int>(n);
+            color_seen = vector<int>(aN);
+            curr_noise = vector<int>(aN);
+            queries_LCA = vector<vector<vector<int>>>(aN);
         }
 
         void add_edge(int v1, int v2, int w){
@@ -71,7 +76,7 @@ class Graph{
 
                 currEdge = edges[idQueue];
                 
-                if(mst_UF.find_parent(currEdge[0]) != mst_UF.find_parent(currEdge[1])){
+                if(mst_UF.find_root(currEdge[0]) != mst_UF.find_root(currEdge[1])){
                     add_edge_mst(currEdge[0], currEdge[1], currEdge[2]);
                     mst_UF.union_vertices(currEdge[0], currEdge[1]);
                     count++;
@@ -244,28 +249,47 @@ class Graph{
 
         /// itineraries 3
 
-        void tarjan_lca(int u, vector<pair<int,int>>& queries, vector<int>& output){
+        void tarjan_lca(int u, int previous_parent, vector<pair<int,int>>& queries, vector<int>& output){
 
             for(const auto& [child, weight] : mst[u]){
-                tarjan_lca(child, queries, output);
-                color_set.union_vertices_color_set(u, child, depth_mp[u], depth_mp[child]);
-                // add weight of child - parent as well
+                if(child == previous_parent) continue;
+
+                tarjan_lca(child, u, queries, output);
+
+                color_set.set_parent(child, u);
+                curr_noise[child] = weight;
             }
 
             color_seen[u] = 1;
-            ///
+
             for(int i = 0; i < queries.size(); i++){
                 auto [x,y] = queries[i];
                 if(u == x && color_seen[y]){
-                    output[i] = color_set.find_parent(y); // here must perform the upward movement instead
+                    update_weight_to_root(y);
+                    queries_LCA[color_set.find_root(y)].push_back({i,y,u});
                 }
 
                 if(u == y && color_seen[x]){
-                    output[i] = color_set.find_parent(x); // here must perform the upward movement instead
+                    update_weight_to_root(x);
+                    queries_LCA[color_set.find_root(x)].push_back({i,x,u});
                 }
             }
 
-            
+            for(vector<int> query : queries_LCA[u]){
+                int output_integer = query[0];
+                int computed_node = query[1];
+                int to_compute_node = query[2];
+                
+                update_weight_to_root(to_compute_node);
+                update_weight_to_root(computed_node);
+
+                if(computed_node == to_compute_node) output[output_integer] = 0;
+                else if(computed_node == u) output[output_integer] = curr_noise[to_compute_node];
+                else if(to_compute_node == u) output[output_integer] = curr_noise[computed_node];
+                else output[output_integer] = max(curr_noise[computed_node], curr_noise[to_compute_node]);
+            }
+
+            return;
         }
 
         // functions to allow the mapping {ancestor, node} -> weight
@@ -281,21 +305,54 @@ class Graph{
 
         // updating ancestor weight mapping
 
-        void upward_update(int node){
-            if(node == color_set.find_parent(node)) return;
-            return; //hash_weight_mp
+        void update_weight_to_root(int node){
+            int ancestor = color_set.find_root(node);
+            int next = node;
+            vector<int> path;
+
+            // Generates the path to compute the maximum distance from ancestor to node
+            // from top to bottom
+            while(next != ancestor){
+                path.push_back(next);
+                next = color_set.get_parent(next);
+            }
+
+            // Performs the path from the ancestor to the required node, compressing the path
+            int curr_node;
+            int weight = 0;
+
+            while(!path.empty()){
+                int curr_node = path.back(); path.pop_back();
+                weight = max(weight, curr_noise[curr_node]);
+                curr_noise[curr_node] = weight; color_set.set_parent(curr_node, ancestor);
+            }
         }
+
+        // void upward_update(int node){
+        //     int curr_ancestor = color_set.find_root(node);
+        //     int next = node;
+        //     while(next != curr_ancestor){
+        //         curr_noise[node] = max(curr_noise[node], curr_noise[next]);
+        //         next = color_set.get_parent(next);
+        //     }
+        // }
 
         // while the current LCA is not reach, move up and update the table
 
-        int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
+        void itineraries_v3(vector<pair<int,int>>& queries, vector<int>& output){
+            tarjan_lca(0, 0, queries, output);
+            for(int answer : output){
+                cout << answer << endl;
+            }
 
-            int max_weight = 0;
+            return;
 
-            max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
-            max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
+            // int max_weight = 0;
 
-            return max_weight;
+            // max_weight = get_same_level(queries[i].first, output[i], max_weight).second;
+            // max_weight = max(max_weight, get_same_level(queries[i].second, output[i], max_weight).second);
+
+            // return max_weight;
         }
 
 };

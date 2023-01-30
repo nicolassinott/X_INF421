@@ -51,22 +51,19 @@ class UnionFind{
             cout << endl;
         }
 
-        int find_parent(int v){
+        int find_root(int v){
             int parent = parents[v];
-
             if(v == parent)
                 return v;
-
-            int newParent = find_parent(parent);
-            
+            int newParent = find_root(parent);
             parents[v] = newParent; // path compression
 
             return newParent;
         }
 
         void union_vertices(int v1, int v2){
-            int parent1 = find_parent(v1);
-            int parent2 = find_parent(v2);
+            int parent1 = find_root(v1);
+            int parent2 = find_root(v2);
 
             if (parent1 == parent2) return;//no union necessary
                 
