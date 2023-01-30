@@ -12,33 +12,47 @@ class Graph{
         vector<vector<pair<int,int>>> mst;
         UnionFind mst_UF;
 
-        // For question 3
+        // For Task 3 (itineraries_v2)
 
         vector<int> depth_mp;// Takes 1 as root and maps to the depth of element with respect to 1
         vector<vector<pair<int,int>>> ancestors_mp;
 
+        // For Task 4 (itineraries_v3)
+
+        UnionFind color_set;
+        vector<int> color_seen;
+
         Graph(int aN, int aM) {
             n = aN;
             m = aM;
+
+            // Necessary for the generation of the MST
+
             mst_UF = UnionFind(aN); //getUnionFind(aN);
             mst = vector<vector<pair<int,int>>>(n);
-            for(int i = 0; i < n; i++){
-                depth_mp.push_back(-1);
-            }
+            
+            // Only necessary from Task 3
+
+            for(int i = 0; i < n; i++) depth_mp.push_back(-1); // only for task 3
             ancestors_mp = vector<vector<pair<int,int>>>(n);
+
+            // Only ncessary from Task 4
+
+            color_set = UnionFind(aN);
+            color_seen = vector<int>(n);
         }
 
-        void addEdge(int v1, int v2, int w){
+        void add_edge(int v1, int v2, int w){
             vector<int> new_edge{v1,v2,w};
             edges.push_back(new_edge);
         }
 
-        void addEdgeMST(int v1, int v2, int w){
+        void add_edge_mst(int v1, int v2, int w){
             mst[v1].push_back({v2,w});
             mst[v2].push_back({v1,w});
         }
 
-        void makeMST(){
+        void make_mst(){
             // Sorting the priority queue
             sort(
                 edges.begin(), 
@@ -56,9 +70,9 @@ class Graph{
 
                 currEdge = edges[idQueue];
                 
-                if(mst_UF.findParent(currEdge[0]) != mst_UF.findParent(currEdge[1])){
-                    addEdgeMST(currEdge[0], currEdge[1], currEdge[2]);
-                    mst_UF.unionVertices(currEdge[0], currEdge[1]);
+                if(mst_UF.find_parent(currEdge[0]) != mst_UF.find_parent(currEdge[1])){
+                    add_edge_mst(currEdge[0], currEdge[1], currEdge[2]);
+                    mst_UF.union_vertices(currEdge[0], currEdge[1]);
                     count++;
                 }
 
@@ -69,7 +83,7 @@ class Graph{
         }
 
         int itineraries_v1(int u, int v){ 
-            if(mst.empty()) makeMST();
+            if(mst.empty()) make_mst();
             
             vector<pair<int,int>> inverset_path(n);
             stack<int> graphStack;
@@ -229,29 +243,23 @@ class Graph{
 
         /// itineraries 3
 
-        vector<pair<int,int>> queries;
-        vector<int> output;
-
-        UnionFind color_set = UnionFind(n);
-
-        void tarjan_LCA(int u, unordered_set<int>& seen, vector<pair<int,int>>& queries, vector<int>& output, UnionFind& color_set){
+        void tarjan_lca(int u, vector<pair<int,int>>& queries, vector<int>& output){
 
             for(const auto& [child, weight] : mst[u]){
-                tarjan_LCA(child, seen, queries, output, color_set);
-                color_set.unionVertices(u,child);
-                color_set.parents[color_set.findParent(u)] = u;
+                tarjan_lca(child, queries, output);
+                color_set.union_vertices_color_set(u, child, depth_mp[u], depth_mp[child]);
             }
 
-            seen.insert(u);
+            color_seen[u] = 1;
             ///
             for(int i = 0; i < queries.size(); i++){
                 auto [x,y] = queries[i];
-                if(u == x && seen.count(y)){
-                    output[i] = color_set.findParent(y);
+                if(u == x && color_seen[y]){
+                    output[i] = color_set.find_parent(y); // here must perform the upward movement instead
                 }
 
-                if(u == y && seen.count(x)){
-                    output[i] = color_set.findParent(x);
+                if(u == y && color_seen[x]){
+                    output[i] = color_set.find_parent(x); // here must perform the upward movement instead
                 }
             }
         }

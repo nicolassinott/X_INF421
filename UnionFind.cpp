@@ -45,26 +45,25 @@ class UnionFind{
             cout << endl;
         }
 
-        int findParent(int v){
+        int find_parent(int v){
             int parent = parents[v];
 
             if(v == parent)
                 return v;
 
-            int newParent = findParent(parent);
+            int newParent = find_parent(parent);
             
             parents[v] = newParent; // path compression
 
             return newParent;
         }
 
-        void unionVertices(int v1, int v2){
-            int parent1 = findParent(v1);
-            int parent2 = findParent(v2);
+        void union_vertices(int v1, int v2){
+            int parent1 = find_parent(v1);
+            int parent2 = find_parent(v2);
 
-            if (parent1 == parent2) //no union necessary
-                return;
-
+            if (parent1 == parent2) return;//no union necessary
+                
             if (rank[parent1] < rank[parent2])
                 parents[parent1] = parent2;
             else if(rank[parent1] > rank[parent2])
@@ -73,5 +72,10 @@ class UnionFind{
                 parents[parent2] = parent1;
                 rank[parent1]++;
             }
+        }
+
+        void union_vertices_color_set(int v1, int v2, int depth_v1, int depth_v2){
+            if (depth_v1 < depth_v2) parents[v2] = v1;
+            else parents[v2] = v1;
         }
 };

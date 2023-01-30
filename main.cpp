@@ -17,7 +17,7 @@ int main(){
 
     for(int i = 0; i < m; i++){       
         cin >> u >> v >> w;
-        input_graph.addEdge(u - 1, v - 1, w);
+        input_graph.add_edge(u - 1, v - 1, w);
     }
 
     // Saving the queries
@@ -28,7 +28,7 @@ int main(){
         queries.push_back({u - 1,v - 1});
     }
 
-    input_graph.makeMST();
+    input_graph.make_mst();
 
     //necessary for itinerariesv2
     input_graph.get_depth_map();
