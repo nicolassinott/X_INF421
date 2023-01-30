@@ -1,0 +1,11 @@
+
+itineraries.0,0.589
+itineraries.1,0.062
+itineraries.2,2.396
+itineraries.3,8.167
+itineraries.4,9.238
+itineraries.5,5.334
+itineraries.6,9.702
+itineraries.7,10.155
+itineraries.8,9.067
+itineraries.9,10.274

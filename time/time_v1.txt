@@ -1,0 +1,4 @@
+
+itineraries.0,0.882
+itineraries.1,0.051
+itineraries.2,

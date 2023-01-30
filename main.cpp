@@ -7,7 +7,7 @@ using namespace std;
 int main(){
 
     // Set here the itineraries version you want to use {1,2,3}
-    int version = 1;
+    int version = 2;
 
     // Common Initialization //
 
@@ -66,7 +66,6 @@ int main(){
         vector<int> output(l);
         vector<vector<pair<int,int>>> queries_map = input_graph.get_queries_map(queries);
         input_graph.itineraries_v3(queries_map, output);
-        input_graph.printMST();
     }
 
     // ------------------- //
