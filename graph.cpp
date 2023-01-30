@@ -88,6 +88,17 @@ class Graph{
             return;
         }
 
+        void printMST(){
+            for(int i = 0; i < n; i++){
+                cout << "Node " << i << ":" << endl;
+                cout << "\t";
+                for(pair<int,int> pair : mst[i]){
+                    cout << "|" << pair.first << " - " << pair.second << "|";
+                }
+                cout << endl;
+            }
+        }
+
         int itineraries_v1(int u, int v){ 
             if(mst.empty()) make_mst();
             
@@ -250,6 +261,7 @@ class Graph{
         /// itineraries 3
 
         void tarjan_lca(int u, int previous_parent, vector<vector<pair<int,int>>>& queries_map, vector<int>& output){
+
             for(const auto& [child, weight] : mst[u]){
                 if(child == previous_parent) continue;
 
@@ -300,21 +312,25 @@ class Graph{
         }
 
         void update_weight_to_root(int node){
-            int ancestor = color_set.find_root(node);
+            int ancestor = color_set.find_root_no_compression(node);
+            if (ancestor == color_set.get_parent(node)) return;
+
             int next = node;
             vector<int> path;
+            int weight;
 
             // Generates the path to compute the maximum distance from ancestor to node
             // from top to bottom
+
             while(next != ancestor){
                 path.push_back(next);
-                next = color_set.get_parent(next);
+                weight = curr_noise[next];
+                next = color_set.get_parent(next);     
             }
 
             // Performs the path from the ancestor to the required node, compressing the path
             int curr_node;
-            int weight = 0;
-
+            
             while(!path.empty()){
                 int curr_node = path.back(); path.pop_back();
                 weight = max(weight, curr_noise[curr_node]);
@@ -323,7 +339,7 @@ class Graph{
         }
 
         void itineraries_v3(vector<vector<pair<int,int>>>& queries_map, vector<int>& output){
-            tarjan_lca(0, 0, queries_map, output);
+            tarjan_lca(0, -1, queries_map, output);
             
             for(int answer : output){
                 cout << answer << endl;

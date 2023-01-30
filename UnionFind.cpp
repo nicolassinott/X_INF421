@@ -36,6 +36,12 @@ class UnionFind{
             parents[u] = parent;
         }
 
+        int find_root_no_compression(int u){
+            int parent = parents[u];
+            if (u == parent) return u;
+            else return find_root_no_compression(parent); 
+        }
+
         void print(){
             cout << "This is the parent array:" << "\n";
             for(int i = 0; i < nElements; i++){
