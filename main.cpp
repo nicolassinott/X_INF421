@@ -5,6 +5,12 @@
 using namespace std;
 
 int main(){
+
+    // Set here the itineraries version you want to use {1,2,3}
+    int version = 1;
+
+    // Common Initialization //
+
     int n, m;
     int u, v, w;
     int l;
@@ -13,7 +19,7 @@ int main(){
     // Generating graph
     cin >> n >> m;
 
-    Graph input_graph = Graph(n,m);
+    Graph input_graph = Graph(n, m, version);
 
     for(int i = 0; i < m; i++){       
         cin >> u >> v >> w;
@@ -30,21 +36,38 @@ int main(){
 
     input_graph.make_mst();
 
-    //necessary for itinerariesv2
-    input_graph.get_depth_map();
-    // input_graph.get_ancestors();
-    // //necessary for itinerariesv2
+    // ------------------- //
 
-    // for(pair<int,int> query : queries){
-    //     cout << input_graph.itineraries_v2(query.first, query.second) << endl;
-    // }
+    // itineraries_v1 main //
 
-    //necessary for itinerariesv3
+    if(version == 1){
+        for(pair<int,int> query : queries){
+            cout << input_graph.itineraries_v1(query.first, query.second) << endl;
+        }
+    }
 
-    vector<int> output(l);
-    vector<vector<pair<int,int>>> queries_map = input_graph.get_queries_map(queries);
+    // ------------------- //
 
-    input_graph.itineraries_v3(queries_map, output);
+    // itineraries_v2 main //
 
-    input_graph.printMST();
+    if(version == 2){
+        input_graph.get_depth_map();
+        input_graph.get_ancestors();
+        for(pair<int,int> query : queries){
+            cout << input_graph.itineraries_v2(query.first, query.second) << endl;
+        }
+    }
+
+    // ------------------- //
+
+    // itineraries_v3 main //
+
+    if(version == 3){
+        vector<int> output(l);
+        vector<vector<pair<int,int>>> queries_map = input_graph.get_queries_map(queries);
+        input_graph.itineraries_v3(queries_map, output);
+        input_graph.printMST();
+    }
+
+    // ------------------- //
 }

@@ -12,40 +12,49 @@ class Graph{
         vector<vector<pair<int,int>>> mst;
         UnionFind mst_UF;
 
-        // For Task 3 (itineraries_v2)
+        // Only necessary for itineraries_v2 //
 
         vector<int> depth_mp;// Takes 1 as root and maps to the depth of element with respect to 1
         vector<vector<pair<int,int>>> ancestors_mp;
 
-        // For Task 4 (itineraries_v3)
+        // -------------------------------- //
+
+        // Only necessary for itineraries_v3 //
 
         UnionFind color_set;
         vector<int> color_seen;
         vector<int> curr_noise;
         vector<vector<vector<int>>> queries_LCA;
 
+        // -------------------------------- //
+
         unordered_map<int, int> hash_weight_mp;
 
-        Graph(int aN, int aM) {
+        Graph(int aN, int aM, int version) {
             n = aN;
             m = aM;
-
-            // Necessary for the generation of the MST
-
             mst_UF = UnionFind(aN); //getUnionFind(aN);
             mst = vector<vector<pair<int,int>>>(n);
             
-            // Only necessary from Task 3
+            // Only necessary for itineraries_v2 //
 
-            for(int i = 0; i < n; i++) depth_mp.push_back(-1); // only for task 3
-            ancestors_mp = vector<vector<pair<int,int>>>(n);
+            if (version == 2){
+                for(int i = 0; i < n; i++) depth_mp.push_back(-1);
+                ancestors_mp = vector<vector<pair<int,int>>>(n);
+            }
 
-            // Only ncessary from Task 4
+            // -------------------------------- //
 
-            color_set = UnionFind(aN);
-            color_seen = vector<int>(aN);
-            curr_noise = vector<int>(aN);
-            queries_LCA = vector<vector<vector<int>>>(aN);
+            // Only necessary for itineraries_v3 //
+
+            if (version == 3){
+                color_set = UnionFind(aN);
+                color_seen = vector<int>(aN);
+                curr_noise = vector<int>(aN);
+                queries_LCA = vector<vector<vector<int>>>(aN);
+            }
+
+            // -------------------------------- //
         }
 
         void add_edge(int v1, int v2, int w){
@@ -137,7 +146,7 @@ class Graph{
             return maxWeight;
         }
 
-        /// Itineraries 2
+        // Functions for itineraries_v2 //
 
         void get_depth_map(){
             queue<int> bfs;
@@ -258,7 +267,9 @@ class Graph{
             return 0;
         }
 
-        /// itineraries 3
+        // ---------------------------- //
+
+        // Functions for itineraries_v3 //
 
         void tarjan_lca(int u, int previous_parent, vector<vector<pair<int,int>>>& queries_map, vector<int>& output){
 
@@ -347,5 +358,7 @@ class Graph{
 
             return;
         }
+
+        // ---------------------------- //
 
 };
