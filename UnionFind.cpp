@@ -19,7 +19,6 @@ class UnionFind{
         }
 
         UnionFind(const UnionFind& UF){
-            cerr << "i am dumb" << endl;
             nElements = UF.nElements;
             for(auto n : UF.parents){
                 parents.push_back(n);
@@ -29,6 +28,13 @@ class UnionFind{
             }
         }
 
+        int get_parent(int u){
+            return parents[u];
+        }
+
+        void set_parent(int u, int parent){
+            parents[u] = parent;
+        }
 
         void print(){
             cout << "This is the parent array:" << "\n";

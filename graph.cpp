@@ -21,6 +21,7 @@ class Graph{
 
         UnionFind color_set;
         vector<int> color_seen;
+        unordered_map<int, int> hash_weight_mp;
 
         Graph(int aN, int aM) {
             n = aN;
@@ -248,6 +249,7 @@ class Graph{
             for(const auto& [child, weight] : mst[u]){
                 tarjan_lca(child, queries, output);
                 color_set.union_vertices_color_set(u, child, depth_mp[u], depth_mp[child]);
+                // add weight of child - parent as well
             }
 
             color_seen[u] = 1;
@@ -262,7 +264,29 @@ class Graph{
                     output[i] = color_set.find_parent(x); // here must perform the upward movement instead
                 }
             }
+
+            
         }
+
+        // functions to allow the mapping {ancestor, node} -> weight
+        int hash_function(int ancestor, int node){
+            return ancestor * n + node;
+        }
+
+        pair<int,int> de_hash_function(int hash){
+            int ancestor = hash % n; 
+            int node = hash - ancestor * n;
+            return {ancestor, node};
+        }
+
+        // updating ancestor weight mapping
+
+        void upward_update(int node){
+            if(node == color_set.find_parent(node)) return;
+            return; //hash_weight_mp
+        }
+
+        // while the current LCA is not reach, move up and update the table
 
         int itineraries_v3(int i, vector<pair<int,int>> queries, vector<int> output){
 
