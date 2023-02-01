@@ -41,7 +41,7 @@ int main(){
         queries.push_back({u - 1,v - 1});
     }
 
-    input_graph.make_mst();
+    if(m != n-1) input_graph.make_mst();
 
     // ------------------- //
 
