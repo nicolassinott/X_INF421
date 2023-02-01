@@ -21,10 +21,17 @@ int main(){
 
     Graph input_graph = Graph(n, m, version);
 
-    for(int i = 0; i < m; i++){       
-        cin >> u >> v >> w;
-        input_graph.add_edge(u - 1, v - 1, w);
-    }
+    if(m == n - 1){
+        for(int i = 0; i < m; i++){       
+            cin >> u >> v >> w;
+            input_graph.add_edge_mst(u - 1, v - 1, w);
+        }
+    } else {
+        for(int i = 0; i < m; i++){       
+            cin >> u >> v >> w;
+            input_graph.add_edge(u - 1, v - 1, w);
+        }
+    }    
 
     // Saving the queries
     cin >> l;
